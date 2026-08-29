@@ -22,3 +22,20 @@
         name: nginx
         state: started
         enabled: true
+
+    - name: Проверка
+      ansible.builtin.uri:
+        url: "http://localhost"
+        status_code: 200
+        register: http_check
+
+    - name: Статус службы Nginx
+      ansible.builtin.systemd:
+        name: nginx
+        register: nginx_status
+
+    - name: Вывод статуса Nginx в консоль
+      ansible.builtin.debug:
+        msg: 
+          - "HTTP Статус: {{ http_check.status }}"
+          - "Служба Nginx: {{ nginx_status.status.ActiveState }} ({{ nginx_status.status.SubState }})"
