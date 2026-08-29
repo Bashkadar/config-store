@@ -1,0 +1,22 @@
+---
+- name: Установка Nginx
+  hosts: myhosts
+  become: true
+
+  tasks:
+    - name: Обновление пакетов (update&upgrade)
+      ansible.builtin.package:
+        name: "*"
+        state: latest
+        update_cache: true
+
+    - name: Установка Nginx
+      ansible.builtin.package:
+        name: nginx
+        state: present
+
+    - name: Запуск добавление в автозагрузку
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
