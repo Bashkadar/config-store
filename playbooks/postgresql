@@ -1,0 +1,77 @@
+---
+- name: Установка и настройка PostgreSQL
+  hosts: db_servers
+  become: true 
+  
+  vars: # прописать свои логин/пасс:
+    db_name: any_project 
+    db_user: any_user 
+    db_password: "leakpass" # убрать в vault
+    backup_path: "/var/backups/postgres_test_project.sql" 
+
+  tasks:
+    - name: 1. Обновление пакетов apt
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: 2. Установка PostgreSQL и системные зависимости для Python
+      apt:
+        name:
+          - postgresql
+          - postgresql-contrib
+          - python3-psycopg2 
+        state: present
+
+    - name: 3. Проверка PostgreSQL 
+      service:
+        name: postgresql
+        state: started
+        enabled: yes
+
+    - name: 4. Создание пользователя базы данных
+      postgresql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+        role_attr_flags: SUPERUSER #для прогона, потом исправить
+      become_user: postgres 
+
+    - name: 5. Создание базы данных
+      postgresql_db:
+        name: "{{ db_name }}"
+        owner: "{{ db_user }}"
+      become_user: postgres
+
+    - name: 6. Создание таблицы и заполнение тестовыми данными
+      postgresql_query:
+        db: "{{ db_name }}"
+        query: |
+          CREATE TABLE IF NOT EXISTS users (
+              id SERIAL PRIMARY KEY,
+              name VARCHAR(50),
+              email VARCHAR(50)
+          );
+          
+          INSERT INTO users (name, email) 
+          VALUES 
+          ('Иван Иванов', 'ivan@example.com'),
+          ('Петр Петров', 'anna@example.com')
+          ON CONFLICT DO NOTHING;
+      become_user: postgres
+
+    - name: 7. Создание директории для бэкапов
+      file:
+        path: "{{ backup_path | dirname }}"
+        state: directory
+        mode: '0755'
+
+    - name: 8. Backup DB
+      postgresql_db:
+        name: "{{ db_name }}"
+        state: dump
+        target: "{{ backup_path }}"
+      become_user: postgres
+
+    - name: 9. Вывод информации о бэкапе
+      debug:
+        msg: "Успешно! Бэкап базы данных сохранен на сервере в: {{ backup_path }}"
