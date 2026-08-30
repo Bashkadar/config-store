@@ -10,7 +10,7 @@
         state: latest
         update_cache: true
       async: 600  # Максимальное время ожидания (10 минут)
-      poll: 10    # Каждые 10 секунд Ansible будет писать в консоль, что задача всё еще выполняется
+      poll: 60    # Каждые 60 секунд Ansible пишет в консоль
 
     - name: Установка Nginx
       ansible.builtin.package:
