@@ -16,6 +16,8 @@
       ansible.builtin.package:
         name: nginx
         state: present
+        update_cache: true  #apt update
+        cache_valid_time: 3600  
 
     - name: Запуск добавление в автозагрузку
       ansible.builtin.service:
