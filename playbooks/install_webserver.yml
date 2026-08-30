@@ -27,12 +27,12 @@
       ansible.builtin.uri:
         url: "http://localhost"
         status_code: 200
-        register: http_check
+      register: http_check
 
     - name: Статус службы Nginx
       ansible.builtin.systemd:
         name: nginx
-        register: nginx_status
+      register: nginx_status
 
     - name: Вывод статуса Nginx в консоль
       ansible.builtin.debug:
