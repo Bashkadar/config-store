@@ -3,9 +3,12 @@
 
 - name: Этап 1. Настройка сетевого интерфейса
   ansible.builtin.import_playbook: netplan_setup.yml
+  tags: network
 
 - name: Этап 2. Установка и запуск MySQL
   ansible.builtin.import_playbook: mysql_install.yml
+  tags: database
 
 - name: Этап 3. Установка и запуск Nginx
   ansible.builtin.import_playbook: nginx_install.yml
+  tags: webserver
