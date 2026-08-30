@@ -1,0 +1,62 @@
+---
+- name: Установка MySQL и создание тестовой базы данных
+  hosts: myhosts
+  become: true
+  vars:
+    db_name: "test_store"
+
+  tasks:
+    - name: 1. Установка MySQL Server
+      ansible.builtin.apt:
+        name:
+          - mysql-server
+          - python3-pymysql # для Ansible
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: 2. Запуск и добавление в автозагрузку
+      ansible.builtin.service:
+        name: mysql
+        state: started
+        enabled: true
+
+    - name: 3. Создание тестовой базы данных
+      community.mysql.mysql_db:
+        name: "{{ db_name }}"
+        state: present
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+
+    - name: 4.1 Создание таблицы
+      community.mysql.mysql_query:
+        login_db: "{{ db_name }}"
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        query: |
+          CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100) NOT NULL,
+            lastname VARCHAR(100) NOT NULL
+          )
+
+    - name: 4.2 Наполнение таблицы тестовыми данными
+      community.mysql.mysql_query:
+        login_db: "{{ db_name }}"
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        query: |
+          INSERT INTO users (name, lastname)
+          VALUES
+            ('Иван', 'Иванов'),
+            ('Петр', 'Петров'),
+            ('Сидр', 'Сидоров')
+      register: db_query_result
+
+    - name: 5. Cтатус службы MySQL
+      ansible.builtin.systemd:
+        name: mysql
+      register: mysql_status
+
+    - name: 6. Вывод в консоль
+      ansible.builtin.debug:
+        msg: 
+          - "Служба MySQL: {{ mysql_status.status.ActiveState }} ({{ mysql_status.status.SubState }})"
+          - "Результат заполнения базы данных: {{ db_query_result.msg | default('Данные проверены/добавлены') }}"
