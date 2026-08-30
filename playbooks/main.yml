@@ -3,6 +3,8 @@
 
 - name: Этап 1. Настройка сетевого интерфейса
   ansible.builtin.import_playbook: netplan_setup.yml
+  vars:
+    interface: "enp0s8"
   tags: network
 
 - name: Этап 2. Установка и запуск MySQL
