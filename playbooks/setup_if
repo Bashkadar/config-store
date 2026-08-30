@@ -1,0 +1,42 @@
+---
+- name: Настройка сетевого интерфейса
+  hosts: myhosts
+  become: true
+  vars:
+    interface: "enp0s8"
+    netplan_cfg: "/etc/netplan/50-cloud-init.yaml" 
+
+  tasks:
+    - name: 1. Включение интерфейса
+      ansible.builtin.command: "ip link set {{ interface }} up"
+      changed_when: false 
+
+    - name: 2. Прописан ли интерфейс в файле Netplan?
+      ansible.builtin.command: "grep -q '{{ interface }}:' {{ netplan_cfg }}"
+      register: interface_check
+      failed_when: false
+      changed_when: false
+
+    - name: 3. Добавление конфигурации интерфейса в Netplan
+      ansible.builtin.blockinfile:
+        path: "{{ netplan_cfg }}"
+        insertafter: "ethernets:"
+        marker: "{{ ' # {mark} ANSIBLE MANAGED BLOCK FOR ' | indent(4, true) }}{{ interface }}"
+        block: |
+          {{ interface | indent(4, true) }}:
+          {{ 'dhcp4: true' | indent(6, true) }}
+      when: interface_check.rc != 0 
+      register: netplan_modified
+
+    - name: 4. Применение netplan
+      ansible.builtin.command: "netplan apply"
+      when: netplan_modified.changed
+
+    - name: 5. Ожидание получения IP-адреса и поднятия линка
+      ansible.builtin.pause:
+        seconds: 10
+      when: netplan_modified.changed
+
+    - name: 6. Проверка пинга
+      ansible.builtin.command: "ping -c 4 77.88.8.8"
+      register: ping_result
