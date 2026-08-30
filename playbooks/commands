@@ -1,3 +1,4 @@
+# локальный справочник примеров команд, что бы далеко не бегать, если забыл.
 # Поскольку есть ansible.ini, то флаг -i inventory.ini можно пропустить
 verify:
 ansible-inventory -i inventory.ini --list
