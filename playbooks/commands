@@ -6,3 +6,5 @@ ansible myhosts -m ping -i inventory.ini
 run playbook:
 ansible-playbook -i inventory.ini playbook.yml -K -v
 ansible-playbook -i inventory.ini main.yml --skip-tags database
+ansible-playbook -i inventory.ini main.yml --tags webserver
+ansible-playbook -i inventory.ini main.yml --skip-tags "database,webserver"
