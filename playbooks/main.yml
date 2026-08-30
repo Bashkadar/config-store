@@ -1,0 +1,11 @@
+---
+# Основной плейбук для настройки сервера
+
+- name: Этап 1. Настройка сетевого интерфейса
+  ansible.builtin.import_playbook: netplan_setup.yml
+
+- name: Этап 2. Установка и запуск MySQL
+  ansible.builtin.import_playbook: mysql_install.yml
+
+- name: Этап 3. Установка и запуск Nginx
+  ansible.builtin.import_playbook: nginx_install.yml
