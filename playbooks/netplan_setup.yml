@@ -21,7 +21,7 @@
       ansible.builtin.blockinfile:
         path: "{{ netplan_cfg }}"
         insertafter: "ethernets:"
-        marker: 
+        marker:
         "{{ ' # {mark} ANSIBLE MANAGED BLOCK FOR ' | indent(4, true) }}{{ interface }}"
         block: |
           {{ interface | indent(4, true) }}:
@@ -41,7 +41,7 @@
     - name: 6. Проверка пинга
       ansible.builtin.command: "ping -c 4 77.88.8.8"
       register: ping_result
-     
+    
     - name: 7. Обновление пакетов (apt update & upgrade)
       ansible.builtin.apt:
         update_cache: true      # apt update
