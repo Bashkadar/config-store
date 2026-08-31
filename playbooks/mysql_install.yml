@@ -22,13 +22,13 @@
         enabled: true
 
     - name: 3. Создание тестовой базы данных
-      community.mysql.mysql_db:
+      ansible.mysql.mysql_db:
         name: "{{ db_name }}"
         state: present
         login_unix_socket: /var/run/mysqld/mysqld.sock
 
     - name: 4.1 Создание таблицы
-      community.mysql.mysql_query:
+      ansible.mysql.mysql_query:
         login_db: "{{ db_name }}"
         login_unix_socket: /var/run/mysqld/mysqld.sock
         query: |
@@ -39,7 +39,7 @@
           )
 
     - name: 4.2 Наполнение таблицы тестовыми данными
-      community.mysql.mysql_query:
+      ansible.mysql.mysql_query:
         login_db: "{{ db_name }}"
         login_unix_socket: /var/run/mysqld/mysqld.sock
         query: |
