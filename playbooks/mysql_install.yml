@@ -10,7 +10,7 @@
       ansible.builtin.apt:
         name:
           - mysql-server
-          - python3-pymysql # для Ansible
+          - python3-pymysql  # для Ansible
         state: present
         update_cache: true
         cache_valid_time: 3600
@@ -55,8 +55,11 @@
         name: mysql
       register: mysql_status
 
-    - name: 6. Вывод в консоль
+- name: 6. Вывод в консоль
       ansible.builtin.debug:
-        msg: 
-          - "Служба MySQL: {{ mysql_status.status.ActiveState }} ({{ mysql_status.status.SubState }})"
-          - "Результат заполнения базы данных: {{ db_query_result.msg | default('Данные проверены/добавлены') }}"
+        msg:
+          - "Служба MySQL: %s (%s)" | format(
+              mysql_status.status.ActiveState,
+              mysql_status.status.SubState)
+          - "Результат заполнения базы данных: %s" | format(
+              db_query_result.msg | default('Данные проверены/добавлены'))
