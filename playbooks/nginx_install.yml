@@ -9,7 +9,7 @@
         name: nginx
         state: present
         update_cache: true  # apt update
-        cache_valid_time: 3600 
+        cache_valid_time: 3600
 
     - name: Запуск добавление в автозагрузку
       ansible.builtin.service:
@@ -32,8 +32,9 @@
       ansible.builtin.debug:
         msg:
           - >
-            HTTP Статус: 
+            HTTP Статус:
             {{ http_check.status }}
           - >
-            Служба Nginx: 
-            {{ nginx_status.status.ActiveState }} ({{ nginx_status.status.SubState }})
+            Служба Nginx:
+            {{ nginx_status.status.ActiveState }} 
+            ({{ nginx_status.status.SubState }})
