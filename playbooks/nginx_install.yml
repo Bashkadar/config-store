@@ -36,5 +36,5 @@
             {{ http_check.status }}
           - >
             Служба Nginx:
-            {{ nginx_status.status.ActiveState }} 
+            {{ nginx_status.status.ActiveState }}
             ({{ nginx_status.status.SubState }})
