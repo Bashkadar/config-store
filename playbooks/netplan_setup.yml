@@ -38,7 +38,7 @@
         cache_valid_time: 3600  # кэш обновлялся в течение часа
 
   handlers:
-    # Этот обработчик запускает всю цепочку тасок по очереди, если Netplan изменился
+    # Этот обработчик запускает всю цепочку тасок, если Netplan изменился
     - name: Setup Netplan Interface
       ansible.builtin.command: "netplan apply"
       notify:
