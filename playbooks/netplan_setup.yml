@@ -28,23 +28,28 @@
           {{ interface | indent(4, true) }}:
           {{ 'dhcp4: true' | indent(6, true) }}
       when: interface_check.rc != 0
-      register: netplan_modified
-
-    - name: 4. Применение netplan
-      ansible.builtin.command: "netplan apply"
-      when: netplan_modified.changed
-
-    - name: 5. Ожидание получения IP-адреса и поднятия линка
-      ansible.builtin.pause:
-        seconds: 10
-      when: netplan_modified.changed
-
-    - name: 6. Проверка пинга
-      ansible.builtin.command: "ping -c 4 77.88.8.8"
-      register: ping_result
+      # Если блок добавился, мы уведомляем обработчик цепочки настроек сети:
+      notify: Setup Netplan Interface
 
     - name: 7. Обновление пакетов (apt update & upgrade)
       ansible.builtin.apt:
         update_cache: true  # apt update
         upgrade: dist  # apt upgrade
         cache_valid_time: 3600  # кэш обновлялся в течение часа
+
+  handlers:
+    # Этот обработчик запускает всю цепочку тасок по очереди, если Netplan изменился
+    - name: Setup Netplan Interface
+      ansible.builtin.command: "netplan apply"
+      notify:
+        - Wait for IP
+        - Check Ping
+
+    - name: Wait for IP
+      ansible.builtin.pause:
+        seconds: 10
+      notify: Check Ping
+
+    - name: Check Ping
+      ansible.builtin.command: "ping -c 4 77.88.8.8"
+      changed_when: false  # Пинг просто проверяет сеть, он ничего не изменяет
