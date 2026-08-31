@@ -9,6 +9,8 @@
 
 - name: Этап 2. Установка и запуск MySQL
   ansible.builtin.import_playbook: mysql_install.yml
+  vars:
+    db_name: "test_store"
   tags: database
 
 - name: Этап 3. Установка и запуск Nginx
