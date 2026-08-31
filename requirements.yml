@@ -1,4 +1,3 @@
 ---
 collections:
   - name: ansible.mysql
-  targets: playbooks/
