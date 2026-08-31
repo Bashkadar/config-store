@@ -35,3 +35,6 @@ jobs:
       # Шаг 4: Автоматический поиск и проверка ВСЕХ плейбуков
       - name: Run Ansible Lint
         uses: ansible/ansible-lint@v26
+        with:
+          # устанавливаем коллекции из файла requirements.yml
+          setup_collections: true
