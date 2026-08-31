@@ -38,3 +38,4 @@ jobs:
         with:
           # устанавливаем коллекции из файла requirements.yml
           setup_collections: true
+          targets: playbooks/
