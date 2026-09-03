@@ -1,0 +1,91 @@
+---
+- name: Install Node.js and Setup App with Forever
+  hosts: all
+  become: true
+
+  vars:
+    node_version: "20" # Можно указать нужную мажорную версию (18, 20, 22)
+    app_dir: "/var/www/my_node_app"
+    app_entry_point: "app.js"
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install prerequisites
+      ansible.builtin.apt:
+        name:
+          - curl
+          - gnupg
+        state: present
+
+    - name: Add NodeSource apt key
+      ansible.builtin.apt_key:
+        url: "https://nodesource.com"
+        state: present
+
+    - name: Add NodeSource repository
+      ansible.builtin.apt_repository:
+        repo: "deb https://nodesource.com_{{ node_version }}.x nodistro main"
+        state: present
+
+    - name: Install Node.js
+      ansible.builtin.apt:
+        name: nodejs
+        state: present
+
+    - name: Install Forever globally via NPM
+      community.general.npm:
+        name: forever
+        global: true
+        state: present
+
+    - name: Ensure application directory exists
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: '0755'
+        owner: www-data
+        group: www-data
+
+    # В реальном сценарии здесь будет копирование вашего кода (ansible.builtin.copy или git)
+    - name: Create a dummy Node.js application for testing
+      ansible.builtin.copy:
+        dest: "{{ app_dir }}/{{ app_entry_point }}"
+        content: |
+          const http = require('http');
+          const server = http.createServer((req, res) => {
+            if (req.url === '/error') {
+              res.writeHead(500, {'Content-Type': 'text/plain'});
+              res.end('Internal Server Error 500\n');
+              // Симулируем падение процесса при ошибке 500, чтобы forever его поднял
+              process.exit(1); 
+            }
+            res.writeHead(200, {'Content-Type': 'text/plain'});
+            res.end('Hello World\n');
+          });
+          server.listen(3000, () => {
+            console.log('Server running on port 3000');
+          });
+        mode: '0644'
+        owner: www-data
+        group: www-data
+      notify: Restart Node App
+
+    - name: Create Systemd service configuration for Forever
+      ansible.builtin.template:
+        src: node_app.service.j2
+        dest: /etc/systemd/system/node_app.service
+        mode: '0644'
+      notify: Restart Node App
+
+  handlers:
+    - name: Restart Node App
+      ansible.builtin.systemd_service:
+        name: node_app.service
+        state: restarted
+        daemon_reload: true
+        enabled: true
+      changed_when: true # Чтобы ansible-lint не выдавал ошибку, как в прошлый раз
