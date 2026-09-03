@@ -86,4 +86,4 @@
         state: restarted
         daemon_reload: true
         enabled: true
-      changed_when: true  # Чтобы ansible-lint не выдавал ошибку, как в прошлый раз
+      changed_when: true
