@@ -41,6 +41,7 @@
     # Этот обработчик запускает всю цепочку тасок, если Netplan изменился
     - name: Setup Netplan Interface
       ansible.builtin.command: "netplan apply"
+      changed_when: true
       notify:
         - Wait for IP
         - Check Ping
