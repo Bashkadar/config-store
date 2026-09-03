@@ -1,0 +1,15 @@
+[Unit]
+Description=Node.js Application Managed by Forever
+After=network.target
+
+[Service]
+Type=forking
+User=www-data
+Group=www-data
+WorkingDirectory={{ app_dir }}
+ExecStart=/usr/bin/forever start -a -l {{ app_dir }}/forever.log -o {{ app_dir }}/out.log -e {{ app_dir }}/err.log {{ app_entry_point }}
+ExecStop=/usr/bin/forever stop {{ app_entry_point }}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
