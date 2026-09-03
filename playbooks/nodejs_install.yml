@@ -4,7 +4,7 @@
   become: true
 
   vars:
-    node_version: "20" # Можно указать нужную мажорную версию (18, 20, 22)
+    node_version: "20"  # Можно указать нужную мажорную версию (18, 20, 22)
     app_dir: "/var/www/my_node_app"
     app_entry_point: "app.js"
 
@@ -50,7 +50,7 @@
         owner: www-data
         group: www-data
 
-    # В реальном сценарии здесь будет копирование вашего кода (ansible.builtin.copy или git)
+    # Здесь вставка своего кода (ansible.builtin.copy или git)
     - name: Create a dummy Node.js application for testing
       ansible.builtin.copy:
         dest: "{{ app_dir }}/{{ app_entry_point }}"
@@ -59,9 +59,7 @@
           const server = http.createServer((req, res) => {
             if (req.url === '/error') {
               res.writeHead(500, {'Content-Type': 'text/plain'});
-              res.end('Internal Server Error 500\n');
-              // Симулируем падение процесса при ошибке 500, чтобы forever его поднял
-              process.exit(1); 
+              res.end('Hello World!\n');
             }
             res.writeHead(200, {'Content-Type': 'text/plain'});
             res.end('Hello World\n');
@@ -88,4 +86,4 @@
         state: restarted
         daemon_reload: true
         enabled: true
-      changed_when: true # Чтобы ansible-lint не выдавал ошибку, как в прошлый раз
+      changed_when: true  # Чтобы ansible-lint не выдавал ошибку, как в прошлый раз
