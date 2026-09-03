@@ -50,7 +50,7 @@
         owner: www-data
         group: www-data
 
-    # Здесь вставка своего кода (ansible.builtin.copy или git)
+    # Здесь вставка своего кода (ansible.builtin.copy)
     - name: Create a dummy Node.js application for testing
       ansible.builtin.copy:
         dest: "{{ app_dir }}/{{ app_entry_point }}"
