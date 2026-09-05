@@ -15,6 +15,7 @@
     - name: "1. Статус брандмауэра (UFW / Firewalld)"
       ansible.builtin.shell:
         cmd: |
+          set -o pipefail
           if command -v ufw >/dev/null 2>&1; then
               ufw status |
               grep -q "Status: active" && echo "ufw_active"
