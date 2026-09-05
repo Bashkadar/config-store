@@ -4,7 +4,7 @@
   become: true
 
   vars:
-    node_version: "20"  # Можно указать нужную мажорную версию (18, 20, 22)
+    node_version: "20"  # указываем нужную версию
     app_dir: "/var/www/my_node_app"
     app_entry_point: "app.js"
 
