@@ -16,9 +16,12 @@
       ansible.builtin.shell:
         cmd: |
           if command -v ufw >/dev/null 2>&1; then
-              ufw status | grep -q "Status: active" && echo "ufw_active" || echo "ufw_inactive"
+              ufw status | 
+              grep -q "Status: active" && echo "ufw_active" 
+              || echo "ufw_inactive"
           elif command -v firewall-cmd >/dev/null 2>&1; then
-              firewall-cmd --state >/dev/null 2>&1 && echo "firewalld_active" || echo "firewalld_inactive"
+              firewall-cmd --state >/dev/null 2>&1 && echo "firewalld_active" 
+              || echo "firewalld_inactive"
           else
               echo "no_firewall"
           fi
@@ -28,7 +31,7 @@
     - name: КРИТИЧЕСКАЯ ОШИБКА - брандмауэр отключен или не установлен!
       ansible.builtin.fail:
         msg: >
-          Внимание! На сервере не активен ни один брандмауэр. 
+          Внимание! На сервере не активен ни один брандмауэр.
           Текущий статус: {{ firewall_status.stdout }}
       when: firewall_status.stdout in ['ufw_inactive', 'firewalld_inactive', 'no_firewall']
 
@@ -54,5 +57,7 @@
 
     - name: Итог проверки сети
       ansible.builtin.debug:
-        msg: "Сетевой аудит успешно пройден. Все брандмауэры активны, сторонние порты не обнаружены."
+        msg: >
+          Сетевой аудит успешно пройден.
+          Все брандмауэры активны, сторонние порты не обнаружены.
       when: unauthorized_ports | length == 0
