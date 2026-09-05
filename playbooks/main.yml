@@ -17,6 +17,6 @@
   ansible.builtin.import_playbook: nginx_install.yml
   tags: webserver
 
-  - name: Этап 4. Установка и запуск Node.JS
+- name: Этап 4. Установка и запуск Node.JS
   ansible.builtin.import_playbook: nodejs_install.yml
   tags: backend
