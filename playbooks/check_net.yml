@@ -16,11 +16,11 @@
       ansible.builtin.shell:
         cmd: |
           if command -v ufw >/dev/null 2>&1; then
-              ufw status | 
-              grep -q "Status: active" && echo "ufw_active" 
+              ufw status |
+              grep -q "Status: active" && echo "ufw_active"
               || echo "ufw_inactive"
           elif command -v firewall-cmd >/dev/null 2>&1; then
-              firewall-cmd --state >/dev/null 2>&1 && echo "firewalld_active" 
+              firewall-cmd --state >/dev/null 2>&1 && echo "firewalld_active"
               || echo "firewalld_inactive"
           else
               echo "no_firewall"
@@ -33,7 +33,9 @@
         msg: >
           Внимание! На сервере не активен ни один брандмауэр.
           Текущий статус: {{ firewall_status.stdout }}
-      when: firewall_status.stdout in ['ufw_inactive', 'firewalld_inactive', 'no_firewall']
+      when: >
+        firewall_status.stdout in
+        ['ufw_inactive', 'firewalld_inactive', 'no_firewall']
 
     - name: "2. Сбор всех открытых портов (слушающих TCP/UDP)"
       ansible.builtin.shell:
@@ -46,12 +48,14 @@
 
     - name: Фильтрация и поиск несанкционированных портов
       ansible.builtin.set_fact:
-        unauthorized_ports: "{{ listening_ports_raw.stdout_lines | map('int') | difference(allowed_ports) }}"
+        unauthorized_ports: ({{ listening_ports_raw.stdout_lines
+                            | map('int')
+                            | difference(allowed_ports) }})
 
     - name: ПРЕДУПРЕЖДЕНИЕ - обнаружены лишние открытые порты
       ansible.builtin.debug:
         msg: >
-          Внимание! На сервере обнаружены слушающие порты, 
+          Внимание! На сервере обнаружены слушающие порты,
           которые не внесены в белый список: {{ unauthorized_ports }}
       when: unauthorized_ports | length > 0
 
