@@ -5,7 +5,7 @@
   gather_facts: false
 
   tasks:
-    - name: 1. ПРОВЕРКА: Поиск пользователей с пустым паролем
+    - name: 1. Поиск пользователей с пустым паролем
       ansible.builtin.shell: |
         set -o pipefail
         awk -F: '($2 == "" || $2 == "!") {print $1}' /etc/shadow
@@ -13,12 +13,12 @@
       register: empty_passwords
       changed_when: false
 
-    - name: КРИТИЧЕСКАЯ ОШИБКА: Обнаружены пользователи без пароля!
+    - name: КРИТИЧЕСКАЯ ОШИБКА - обнаружены пользователи без пароля!
       ansible.builtin.fail:
         msg: "Внимание! Найдены пользователи без установленного пароля: {{ empty_passwords.stdout_lines }}"
       when: empty_passwords.stdout_lines | length > 0
 
-    - name: 2. ПРОВЕРКА: Поиск сторонних пользователей с UID 0 (Duplicate Root)
+    - name: 2. Поиск сторонних пользователей с UID 0 (Duplicate Root)
       ansible.builtin.shell: |
         set -o pipefail
         awk -F: '($3 == 0 && $1 != "root") {print $1}' /etc/passwd
@@ -26,14 +26,14 @@
       register: duplicate_uid_zero
       changed_when: false
 
-    - name: КРИТИЧЕСКАЯ ОШИБКА: Обнаружены сторонние пользователи с UID 0!
+    - name: КРИТИЧЕСКАЯ ОШИБКА - обнаружены сторонние пользователи с UID 0!
       ansible.builtin.fail:
         msg: >
           Внимание! Обнаружены пользователи с правами root (UID 0):
           {{ duplicate_uid_zero.stdout_lines }}
       when: duplicate_uid_zero.stdout_lines | length > 0
 
-    - name: 3. ПРОВЕРКА: Поиск устаревших/слабых алгоритмов хеширования паролей
+    - name: 3. Поиск устаревших/слабых алгоритмов хеширования паролей
       ansible.builtin.shell: |
         set -o pipefail
         # Ищет хеши, не начинающиеся с $6$ (SHA-512) или $y$ (Yescrypt)
@@ -42,14 +42,14 @@
       register: weak_hashes
       changed_when: false
 
-    - name: ПРЕДУПРЕЖДЕНИЕ: Использование слабых алгоритмов хеширования
+    - name: ПРЕДУПРЕЖДЕНИЕ - использование слабых алгоритмов хеширования
       ansible.builtin.debug:
         msg: >
           Рекомендуется обновить хеши паролей для:
           {{ weak_hashes.stdout_lines }}
       when: weak_hashes.stdout_lines | length > 0
 
-    - name: 4. ПРОВЕРКА: Аудит политик устаревания паролей (/etc/login.defs)
+    - name: 4. Аудит политик устаревания паролей (/etc/login.defs)
       ansible.builtin.shell: |
         set -o pipefail
         grep -E '^PASS_MAX_DAYS' /etc/login.defs | awk '{print $2}'
@@ -57,7 +57,7 @@
       register: pass_max_days
       changed_when: false
 
-    - name: ПРЕДУПРЕЖДЕНИЕ: Слишком долгий срок действия пароля по умолчанию
+    - name: ПРЕДУПРЕЖДЕНИЕ - слишком долгий срок действия пароля по умолчанию
       ansible.builtin.debug:
         msg: >
           Максимальный срок действия пароля: {{ pass_max_days.stdout }}.
