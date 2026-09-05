@@ -1,0 +1,12 @@
+- name: Проверка пользователей и паролей
+  ansible.builtin.import_playbook: check_users.yml
+  tags: users
+  
+  - name: Проверка настроек брандмауэра и портов
+  ansible.builtin.import_playbook: check_net.yml
+  vars:
+    allowed_ports:
+      - 22    # SSH
+      - 80    # HTTP
+      - 443   # HTTPS
+  tags: firewall
