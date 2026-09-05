@@ -2,11 +2,11 @@
 # аудит безопасности
 
 - name: Проверка пользователей и паролей
-  ansible.builtin.import_playbook: check_users.yml
+  ansible.builtin.import_playbook: audit/users_check.yml
   tags: users
 
 - name: Проверка настроек брандмауэра и портов
-  ansible.builtin.import_playbook: check_net.yml
+  ansible.builtin.import_playbook: audit/net_check.yml
   vars:
     allowed_ports:
       - 22    # SSH
