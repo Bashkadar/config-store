@@ -6,7 +6,7 @@
 
   tasks:
     - name: 1. Поиск пользователей с пустым паролем
-      ansible.builtin.shell: 
+      ansible.builtin.shell:
         cmd: |
           set -o pipefail
           awk -F: '($2 == "" || $2 == "!") {print $1}' /etc/shadow
@@ -22,7 +22,7 @@
       when: empty_passwords.stdout_lines | length > 0
 
     - name: 2. Поиск сторонних пользователей с UID 0 (Duplicate Root)
-      ansible.builtin.shell: 
+      ansible.builtin.shell:
         cmd: |
           set -o pipefail
           awk -F: '($3 == 0 && $1 != "root") {print $1}' /etc/passwd
@@ -38,7 +38,7 @@
       when: duplicate_uid_zero.stdout_lines | length > 0
 
     - name: 3. Поиск устаревших/слабых алгоритмов хеширования паролей
-      ansible.builtin.shell: 
+      ansible.builtin.shell:
         cmd: |
           set -o pipefail
           # Ищет хеши, не начинающиеся с $6$ (SHA-512) или $y$ (Yescrypt)
@@ -55,7 +55,7 @@
       when: weak_hashes.stdout_lines | length > 0
 
     - name: 4. Аудит политик устаревания паролей (/etc/login.defs)
-      ansible.builtin.shell: 
+      ansible.builtin.shell:
         cmd: |
           set -o pipefail
           grep -E '^PASS_MAX_DAYS' /etc/login.defs | awk '{print $2}'
