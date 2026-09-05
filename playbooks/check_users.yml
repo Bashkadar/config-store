@@ -28,13 +28,15 @@
 
     - name: КРИТИЧЕСКАЯ ОШИБКА: Обнаружены сторонние пользователи с UID 0!
       ansible.builtin.fail:
-        msg: "Внимание! Обнаружены пользователи с правами root (UID 0): {{ duplicate_uid_zero.stdout_lines }}"
+        msg: > 
+          Внимание! Обнаружены пользователи с правами root (UID 0): 
+          {{ duplicate_uid_zero.stdout_lines }}
       when: duplicate_uid_zero.stdout_lines | length > 0
 
     - name: 3. ПРОВЕРКА: Поиск устаревших/слабых алгоритмов хеширования паролей
       ansible.builtin.shell: |
         set -o pipefail
-        # Ищет хеши, не начинающиеся с $6$ (SHA-512) или $y$ (Yescrypt) у реальных пользователей
+        # Ищет хеши, не начинающиеся с $6$ (SHA-512) или $y$ (Yescrypt)
         awk -F: '$2 ~ /^\$[^6y]/ {print $1}' /etc/shadow
       executable: /bin/bash
       register: weak_hashes
@@ -42,7 +44,9 @@
 
     - name: ПРЕДУПРЕЖДЕНИЕ: Использование слабых алгоритмов хеширования
       ansible.builtin.debug:
-        msg: "Рекомендуется обновить хеши паролей (используется старый алгоритм) для: {{ weak_hashes.stdout_lines }}"
+        msg: >
+          Рекомендуется обновить хеши паролей для:
+          {{ weak_hashes.stdout_lines }}
       when: weak_hashes.stdout_lines | length > 0
 
     - name: 4. ПРОВЕРКА: Аудит политик устаревания паролей (/etc/login.defs)
@@ -55,10 +59,14 @@
 
     - name: ПРЕДУПРЕЖДЕНИЕ: Слишком долгий срок действия пароля по умолчанию
       ansible.builtin.debug:
-        msg: "Максимальный срок действия пароля составляет {{ pass_max_days.stdout }}. Рекомендуется установить значение не более 90 или 180 дней."
+        msg: >
+          Максимальный срок действия пароля составляет {{ pass_max_days.stdout }}.
+          Рекомендуется установить значение не более 90 или 180 дней.
       when: (pass_max_days.stdout | int > 180 or 
             pass_max_days.stdout | int == 99999)
 
     - name: Итог проверки
       ansible.builtin.debug:
-        msg: "Базовый аудит пользователей и групп успешно пройден. Критических уязвимостей не обнаружено."
+        msg: >
+          Базовый аудит пользователей и групп успешно пройден.
+          Критических уязвимостей не обнаружено.
