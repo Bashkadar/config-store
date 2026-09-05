@@ -1,8 +1,11 @@
+---
+# аудит безопасности
+
 - name: Проверка пользователей и паролей
   ansible.builtin.import_playbook: check_users.yml
   tags: users
   
-  - name: Проверка настроек брандмауэра и портов
+- name: Проверка настроек брандмауэра и портов
   ansible.builtin.import_playbook: check_net.yml
   vars:
     allowed_ports:
