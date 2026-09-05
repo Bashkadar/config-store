@@ -2,21 +2,21 @@
 # Основной плейбук для настройки сервера
 
 - name: Этап 1. Настройка сетевого интерфейса
-  ansible.builtin.import_playbook: netplan_setup.yml
+  ansible.builtin.import_playbook: setup/netplan_setup.yml
   vars:
     interface: "enp0s8"
   tags: network
 
 - name: Этап 2. Установка и запуск MySQL
-  ansible.builtin.import_playbook: mysql_install.yml
+  ansible.builtin.import_playbook: install/mysql_install.yml
   vars:
     db_name: "test_store"
   tags: database
 
 - name: Этап 3. Установка и запуск Nginx
-  ansible.builtin.import_playbook: nginx_install.yml
+  ansible.builtin.import_playbook: install/nginx_install.yml
   tags: webserver
 
 - name: Этап 4. Установка и запуск Node.JS
-  ansible.builtin.import_playbook: nodejs_install.yml
+  ansible.builtin.import_playbook: install/nodejs_install.yml
   tags: backend
