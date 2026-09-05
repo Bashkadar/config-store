@@ -20,3 +20,7 @@
 - name: Этап 4. Установка и запуск Node.JS
   ansible.builtin.import_playbook: install/nodejs_install.yml
   tags: backend
+
+- name: Этап 5. Настройка брандмауэра
+  ansible.builtin.import_playbook: setup/ufw_setup.yml
+  tags: network
