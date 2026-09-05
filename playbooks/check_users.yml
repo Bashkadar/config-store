@@ -15,7 +15,9 @@
 
     - name: КРИТИЧЕСКАЯ ОШИБКА - обнаружены пользователи без пароля!
       ansible.builtin.fail:
-        msg: "Внимание! Найдены пользователи без установленного пароля: {{ empty_passwords.stdout_lines }}"
+        msg: >
+          Внимание! Найдены пользователи без установленного пароля: 
+          {{ empty_passwords.stdout_lines }}
       when: empty_passwords.stdout_lines | length > 0
 
     - name: 2. Поиск сторонних пользователей с UID 0 (Duplicate Root)
